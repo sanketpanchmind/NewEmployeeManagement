@@ -13,7 +13,7 @@ namespace NewEmployeeManagement.Models
 
         public DateTime EndDate { get; set; }
 
-        public int NoofDays { get; set; }
+        public int? NoofDays { get; set; }
 
         public string? Status {  get; set; }
 
@@ -31,10 +31,6 @@ namespace NewEmployeeManagement.Models
         [ForeignKey("LeavetypeId")]
         [ValidateNever]
         public LeaveTypeModel LeaveType { get; set; }
-
-     
-
-
 
 
     }

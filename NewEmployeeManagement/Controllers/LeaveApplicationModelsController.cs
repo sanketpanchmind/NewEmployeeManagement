@@ -17,7 +17,11 @@ namespace NewEmployeeManagement.Controllers
         public LeaveApplicationModelsController(ApplicationDbContext context)
         {
             _context = context;
+           
         }
+
+       
+
 
         // GET: LeaveApplicationModels
         public async Task<IActionResult> Index()
@@ -56,6 +60,7 @@ namespace NewEmployeeManagement.Controllers
             return View();
         }
 
+     
         // POST: LeaveApplicationModels/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -63,8 +68,16 @@ namespace NewEmployeeManagement.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(LeaveApplicationModel leaveApplicationModel)
         {
+
             if (ModelState.IsValid)
             {
+                var d1 = leaveApplicationModel.StartDate;
+                var d2 = leaveApplicationModel.EndDate;
+
+                var d3 = d2.Day - d1.Day;
+
+                leaveApplicationModel.NoofDays = d3;
+
                 leaveApplicationModel.Status = "Pending";
                 leaveApplicationModel.CreatedBy = "Admin";
                 leaveApplicationModel.CreatedOn = DateTime.Now;
@@ -197,6 +210,7 @@ namespace NewEmployeeManagement.Controllers
             ViewData["LeavetypeId"] = new SelectList(_context.LeaveTypes, "Id", "LeaveType", leaveApplicationModel.LeavetypeId);
             return View(leaveApplicationModel);
         }
+
 
         public async Task<IActionResult> RejectApproval(int? Id)
         {
