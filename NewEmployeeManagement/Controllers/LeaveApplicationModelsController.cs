@@ -198,6 +198,68 @@ namespace NewEmployeeManagement.Controllers
             return View(leaveApplicationModel);
         }
 
+        public async Task<IActionResult> RejectApproval(int? Id)
+        {
+            if (Id == null)
+            {
+                return NotFound();
+            }
+
+            var leaveApplicationModel = await _context.LeaveApplications
+                .Include(l => l.Duration)
+                .Include(l => l.Employee)
+                .Include(l => l.LeaveType)
+                .FirstOrDefaultAsync(m => m.Id == Id);
+            if (leaveApplicationModel == null)
+            {
+                return NotFound();
+            }
+
+            return View(leaveApplicationModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RejectApproval(int id, LeaveApplicationModel leaveApplicationModel)
+        {
+
+
+            if (id != leaveApplicationModel.Id)
+            {
+                return NotFound();
+            }
+            leaveApplicationModel = await _context.LeaveApplications.FindAsync(id);
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    leaveApplicationModel.Status = "Rejected";
+                    leaveApplicationModel.ModifiedBy = "Admin";
+                    leaveApplicationModel.ModifiedOn = DateTime.Now;
+
+                    _context.Update(leaveApplicationModel);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!LeaveApplicationModelExists(leaveApplicationModel.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            ViewData["DurationId"] = new SelectList(_context.LeaveDurations, "Id", "Duration", leaveApplicationModel.DurationId);
+            ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "Name", leaveApplicationModel.EmployeeId);
+            ViewData["LeavetypeId"] = new SelectList(_context.LeaveTypes, "Id", "LeaveType", leaveApplicationModel.LeavetypeId);
+            return View(leaveApplicationModel);
+        }
+
         // GET: LeaveApplicationModels/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
